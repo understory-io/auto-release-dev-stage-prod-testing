@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - "dev"
-      - "stage"
 
 permissions:
   contents: write
@@ -15,17 +14,24 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: stage
 
-      - name: Set target branch
-        id: set-target-branch
-        run: echo "TARGET_BRANCH=$([[ '${{ github.ref_name }}' == 'dev' ]] && echo 'stage' || ([[ '${{ github.ref_name }}' == 'stage' ]] && echo 'prod' || echo 'unknown'))" >> $GITHUB_OUTPUT
+      #   - name: Set target branch
+      #     id: set-target-branch
+      #     run: echo "TARGET_BRANCH=$([[ '${{ github.ref_name }}' == 'dev' ]] && echo 'stage' || ([[ '${{ github.ref_name }}' == 'stage' ]] && echo 'prod' || echo 'unknown'))" >> $GITHUB_OUTPUT
+
+      - name: Reset stage promotion branch
+        run: |
+          git fetch origin dev:dev
+          git reset --hard dev
 
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v7
         with:
+          branch: release/auto-${{ steps.set-target-branch.outputs.TARGET_BRANCH }}
           commit-message: |
             Merge ${{ github.ref_name }} into ${{ steps.set-target-branch.outputs.TARGET_BRANCH }}
-          branch: release/auto-${{ steps.set-target-branch.outputs.TARGET_BRANCH }}
           title:
             "Release ${{ github.ref_name }} to ${{ steps.set-target-branch.outputs.TARGET_BRANCH }}"
             # consider having tags in here to ping commit authors
