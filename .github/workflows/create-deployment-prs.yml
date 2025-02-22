@@ -38,3 +38,4 @@ jobs:
             # consider having tags in here to ping commit authors
           body: "Automated PR for releasing changes from ${{ github.ref_name }} into ${{ steps.detect-target-branch.outputs.TARGET_BRANCH }}"
           maintainer-can-modify: false
+          delete-branch: true
