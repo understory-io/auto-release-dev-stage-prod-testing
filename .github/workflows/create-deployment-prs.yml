@@ -18,16 +18,16 @@ jobs:
 
       - name: Set target branch
         id: set-target-branch
-        run: echo "TARGET_BRANCH=$([[ '${{ github.ref_name }}' == 'dev' ]] && echo 'stage' || ([[ '${{ github.ref_name }}' == 'stage' ]] && echo 'prod' || echo 'unknown'))" >> $GITHUB_ENV
+        run: echo "TARGET_BRANCH=$([[ '${{ github.ref_name }}' == 'dev' ]] && echo 'stage' || ([[ '${{ github.ref_name }}' == 'stage' ]] && echo 'prod' || echo 'unknown'))" >> $GITHUB_OUTPUT
 
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v7
         with:
           commit-message: |
-            Merge ${{ github.ref_name }} into $TARGET_BRANCH
-          branch: $TARGET_BRANCH
+            Merge ${{ github.ref_name }} into ${{ steps.set-target-branch.outputs.TARGET_BRANCH }}
+          branch: ${{ steps.set-target-branch.outputs.TARGET_BRANCH }}
           title:
-            "Release ${{ github.ref_name }} to $TARGET_BRANCH"
+            "Release ${{ github.ref_name }} to ${{ steps.set-target-branch.outputs.TARGET_BRANCH }}"
             # consider having tags in here to ping commit authors
-          body: "Automated PR for releasing changes from ${{ github.ref_name }} into $TARGET_BRANCH"
+          body: "Automated PR for releasing changes from ${{ github.ref_name }} into ${{ steps.set-target-branch.outputs.TARGET_BRANCH }}"
           maintainer-can-modify: false
