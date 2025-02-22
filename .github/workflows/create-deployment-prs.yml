@@ -32,7 +32,9 @@ jobs:
         id: store-authors
         run: |
           authors=$(git log --format='%aN <%aE>' | sort -u)
-          echo "AUTHORS=$authors" >> $GITHUB_OUTPUT
+          echo "Authors:"
+          echo "$authors"
+        #   echo "AUTHORS=$authors" >> $GITHUB_OUTPUT
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v7
         with:
