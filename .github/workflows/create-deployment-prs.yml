@@ -28,6 +28,11 @@ jobs:
           git fetch origin ${{ github.ref_name }}:${{ github.ref_name }}
           git reset --hard ${{ github.ref_name }}
 
+      - name: Store commit authors
+        id: store-authors
+        run: |
+          authors=$(git log --format='%aN <%aE>' | sort -u)
+          echo "AUTHORS=$authors" >> $GITHUB_OUTPUT
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v7
         with:
@@ -37,6 +42,10 @@ jobs:
           title:
             "Release ${{ github.ref_name }} to ${{ steps.detect-target-branch.outputs.TARGET_BRANCH }}"
             # consider having tags in here to ping commit authors
-          body: "Automated PR for releasing changes from ${{ github.ref_name }} into ${{ steps.detect-target-branch.outputs.TARGET_BRANCH }}"
+          body: |
+            Automated PR for releasing changes from ${{ github.ref_name }} into ${{ steps.detect-target-branch.outputs.TARGET_BRANCH }}
+
+            Authors:
+            ${{ steps.store-authors.outputs.AUTHORS }}
           maintainer-can-modify: false
           delete-branch: true
