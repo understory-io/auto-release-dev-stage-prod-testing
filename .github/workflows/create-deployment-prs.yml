@@ -1,5 +1,5 @@
 name: Automatically create / update release PRs
-
+run-name: Create PRs for deployment
 on:
   push:
     branches:
@@ -14,20 +14,27 @@ jobs:
   create_pr_repo_sync:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-
-      - name: Set target branch
-        id: set-target-branch
+      - name: Detect target branch
+        id: detect-target-branch
         run: echo "TARGET_BRANCH=$([[ '${{ github.ref_name }}' == 'dev' ]] && echo 'stage' || ([[ '${{ github.ref_name }}' == 'stage' ]] && echo 'prod' || echo 'unknown'))" >> $GITHUB_OUTPUT
+
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ steps.detect-target-branch.outputs.TARGET_BRANCH }}
+
+      - name: Reset ${{ steps.detect-target-branch.outputs.TARGET_BRANCH }} promotion branch
+        run: |
+          git fetch origin ${{ github.ref_name }}:${{ github.ref_name }}
+          git reset --hard ${{ github.ref_name }}
 
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v7
         with:
+          branch: release/auto-${{ steps.detect-target-branch.outputs.TARGET_BRANCH }}
           commit-message: |
-            Merge ${{ github.ref_name }} into ${{ steps.set-target-branch.outputs.TARGET_BRANCH }}
-          branch: ${{ steps.set-target-branch.outputs.TARGET_BRANCH }}
+            Merge ${{ github.ref_name }} into ${{ steps.detect-target-branch.outputs.TARGET_BRANCH }}
           title:
-            "Release ${{ github.ref_name }} to ${{ steps.set-target-branch.outputs.TARGET_BRANCH }}"
+            "Release ${{ github.ref_name }} to ${{ steps.detect-target-branch.outputs.TARGET_BRANCH }}"
             # consider having tags in here to ping commit authors
-          body: "Automated PR for releasing changes from ${{ github.ref_name }} into ${{ steps.set-target-branch.outputs.TARGET_BRANCH }}"
+          body: "Automated PR for releasing changes from ${{ github.ref_name }} into ${{ steps.detect-target-branch.outputs.TARGET_BRANCH }}"
           maintainer-can-modify: false
