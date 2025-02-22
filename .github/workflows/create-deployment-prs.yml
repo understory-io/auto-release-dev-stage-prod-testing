@@ -11,8 +11,9 @@ permissions:
   pull-requests: write
 
 jobs:
-  create_pr_repo_sync:
+  release-prs:
     runs-on: ubuntu-latest
+    name: Create PRs for deployment
     steps:
       - name: Detect target branch
         id: detect-target-branch
