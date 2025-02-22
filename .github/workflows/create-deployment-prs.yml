@@ -45,7 +45,7 @@ jobs:
           body: |
             Automated PR for releasing changes from ${{ github.ref_name }} into ${{ steps.detect-target-branch.outputs.TARGET_BRANCH }}
 
-            Authors:
+            PR includes changes from the following authors:
             ${{ steps.store-authors.outputs.AUTHORS }}
           maintainer-can-modify: false
           delete-branch: true
