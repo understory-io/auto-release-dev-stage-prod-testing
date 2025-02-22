@@ -1,5 +1,5 @@
 name: Automatically create / update release PRs
-
+run-name: Create PRs for deployment
 on:
   push:
     branches:
@@ -25,7 +25,7 @@ jobs:
         with:
           commit-message: |
             Merge ${{ github.ref_name }} into ${{ steps.set-target-branch.outputs.TARGET_BRANCH }}
-          branch: ${{ steps.set-target-branch.outputs.TARGET_BRANCH }}
+          branch: release/auto-${{ steps.set-target-branch.outputs.TARGET_BRANCH }}
           title:
             "Release ${{ github.ref_name }} to ${{ steps.set-target-branch.outputs.TARGET_BRANCH }}"
             # consider having tags in here to ping commit authors
