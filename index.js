@@ -12,13 +12,21 @@ async function run() {
     const token = core.getInput("token", { required: true });
     const octokit = getOctokit(token);
 
-    const commits = await octokit.rest.pulls.listCommits({
-      owner: context.repo.owner,
-      repo: context.repo.repo,
-      pull_number: number,
-    });
+    let commits;
+    try {
+      commits = await octokit.rest.pulls.listCommits({
+        owner: context.repo.owner,
+        repo: context.repo.repo,
+        pull_number: number,
+      });
+    } catch (error) {
+      core.error("failed to list commits");
+      throw error;
+    }
 
     const authors = commits.data.map((commit) => commit.author.login);
+
+    core.info(`Authors: ${authors}`);
 
     const result = await octokit.rest.pulls.requestReviewers({
       owner: context.repo.owner,
