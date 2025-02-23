@@ -19,6 +19,7 @@ async function run(context) {
         repo: context.repo.repo,
         pull_number: number,
       });
+      core.debug("Commits: " + JSON.stringify(commits));
     } catch (error) {
       core.error("failed to list commits");
       throw error;
@@ -38,8 +39,9 @@ async function run(context) {
       reviewers: authors,
     });
 
-    core.debug(JSON.stringify(result));
-    core.info(`@${author} has been assigned to the pull request: #${number}`);
+    core.debug("request reviewers " + JSON.stringify(result));
+
+    core.info(`@${authors} has been assigned to the pull request: #${number}`);
   } catch (error) {
     core.debug("context.payload: " + JSON.stringify(context.payload));
     core.error(error);

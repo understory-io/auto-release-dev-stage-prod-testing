@@ -31895,6 +31895,7 @@ async function run(context) {
         repo: context.repo.repo,
         pull_number: number,
       });
+      _actions_core__WEBPACK_IMPORTED_MODULE_0__.debug("Commits: " + JSON.stringify(commits));
     } catch (error) {
       _actions_core__WEBPACK_IMPORTED_MODULE_0__.error("failed to list commits");
       throw error;
@@ -31914,8 +31915,9 @@ async function run(context) {
       reviewers: authors,
     });
 
-    _actions_core__WEBPACK_IMPORTED_MODULE_0__.debug(JSON.stringify(result));
-    _actions_core__WEBPACK_IMPORTED_MODULE_0__.info(`@${author} has been assigned to the pull request: #${number}`);
+    _actions_core__WEBPACK_IMPORTED_MODULE_0__.debug("request reviewers " + JSON.stringify(result));
+
+    _actions_core__WEBPACK_IMPORTED_MODULE_0__.info(`@${authors} has been assigned to the pull request: #${number}`);
   } catch (error) {
     _actions_core__WEBPACK_IMPORTED_MODULE_0__.debug("context.payload: " + JSON.stringify(context.payload));
     _actions_core__WEBPACK_IMPORTED_MODULE_0__.error(error);
