@@ -12,4 +12,4 @@ jobs:
     name: Assign reviewers
     steps:
       - name: Assign reviewers
-        uses: understory-io/auto-release-dev-stage-prod-testing@dev
+        uses: understory-io/assign-reviewers-github-action@main
