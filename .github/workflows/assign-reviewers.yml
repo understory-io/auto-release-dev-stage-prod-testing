@@ -15,4 +15,4 @@ jobs:
       - name: Assign reviewers
         uses: understory-io/auto-release-dev-stage-prod-testing@dev
         with:
-          repo-token: ${{ secrets.PAT }}
+          token: ${{ secrets.PAT }}

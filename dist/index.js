@@ -31885,7 +31885,7 @@ async function run() {
     }
     const { number } = target;
 
-    const token = _actions_core__WEBPACK_IMPORTED_MODULE_0__.getInput("repo-token", { required: true });
+    const token = _actions_core__WEBPACK_IMPORTED_MODULE_0__.getInput("token", { required: true });
     const octokit = (0,_actions_github__WEBPACK_IMPORTED_MODULE_1__.getOctokit)(token);
 
     const commits = await octokit.rest.pulls.listCommits({

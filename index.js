@@ -9,7 +9,7 @@ async function run() {
     }
     const { number } = target;
 
-    const token = core.getInput("repo-token", { required: true });
+    const token = core.getInput("token", { required: true });
     const octokit = getOctokit(token);
 
     const commits = await octokit.rest.pulls.listCommits({
