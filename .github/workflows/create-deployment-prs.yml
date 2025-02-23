@@ -44,6 +44,6 @@ jobs:
           delete-branch: true
 
       - name: Assign reviewers
-        uses: auto-release-dev-stage-prod-testing/assign-reviewers@dev
+        uses: understory-io/auto-release-dev-stage-prod-testing@dev
         with:
           pr-number: ${{ steps.create-pull-request.outputs.pull-request-number }}
