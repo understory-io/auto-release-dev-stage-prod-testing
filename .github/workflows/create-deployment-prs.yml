@@ -42,8 +42,3 @@ jobs:
             Automated PR for releasing changes from ${{ github.ref_name }} into ${{ steps.detect-target-branch.outputs.TARGET_BRANCH }}
           maintainer-can-modify: false
           delete-branch: true
-
-      - name: Assign reviewers
-        uses: understory-io/auto-release-dev-stage-prod-testing@dev
-        with:
-          pr-number: ${{ steps.create-pull-request.outputs.pull-request-number }}
