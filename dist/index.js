@@ -31884,11 +31884,7 @@ async function run() {
     if (target === undefined) {
       throw new Error("Can't get payload. Check you trigger event");
     }
-    const {
-      pull_request: { requested_reviewers: reviews },
-      number,
-      user: { login: author, type },
-    } = target;
+    const { number } = target;
 
     if (type === "Bot") {
       _actions_core__WEBPACK_IMPORTED_MODULE_0__.info("Assigning author has been skipped since the author is a bot");
@@ -31898,11 +31894,19 @@ async function run() {
     const token = _actions_core__WEBPACK_IMPORTED_MODULE_0__.getInput("repo-token", { required: true });
     const octokit = (0,_actions_github__WEBPACK_IMPORTED_MODULE_1__.getOctokit)(token);
 
+    const commits = await octokit.rest.pulls.listCommits({
+      owner: _actions_github__WEBPACK_IMPORTED_MODULE_1__.context.repo.owner,
+      repo: _actions_github__WEBPACK_IMPORTED_MODULE_1__.context.repo.repo,
+      pull_number: number,
+    });
+
+    const authors = commits.data.map((commit) => commit.author.login);
+
     const result = await octokit.rest.pulls.requestReviewers({
       owner: _actions_github__WEBPACK_IMPORTED_MODULE_1__.context.repo.owner,
       repo: _actions_github__WEBPACK_IMPORTED_MODULE_1__.context.repo.repo,
       issue_number: number,
-      reviewers: [...reviews, author],
+      reviewers: [authors],
     });
 
     _actions_core__WEBPACK_IMPORTED_MODULE_0__.debug(JSON.stringify(result));
