@@ -9,7 +9,7 @@
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.assignReviewers = assignReviewers;
 const github_1 = __nccwpck_require__(3228);
-async function assignReviewers({ owner, repo, number, token, debug, }) {
+async function assignReviewers({ owner, repo, number, token, userLogin, debug, }) {
     const octokit = (0, github_1.getOctokit)(token);
     let commits;
     try {
@@ -24,15 +24,14 @@ async function assignReviewers({ owner, repo, number, token, debug, }) {
         throw new Error("Failed to list commits: " + error.message); // TODO: add cause
     }
     // deduplicate authors in case of multiple commits by the same author
-    const authors = [
-        ...new Set(commits.data.map((commit) => commit.author?.login)),
-    ];
+    const authors = new Set(commits.data.map((commit) => commit.author?.login));
+    authors.delete(userLogin);
     debug(`Authors: ${authors}`);
     const result = await octokit.rest.pulls.requestReviewers({
         owner: owner,
         repo: repo,
         pull_number: number,
-        reviewers: authors,
+        reviewers: [...authors],
     });
     debug("request reviewers " + JSON.stringify(result));
     return authors;
@@ -89,7 +88,7 @@ async function run() {
         if (target === undefined) {
             throw new Error("Can't get payload. Check you trigger event");
         }
-        const { number } = target;
+        const { number, user: { login: userLogin }, } = target;
         const token = core.getInput("token", { required: true });
         const authors = await (0, assignReviewers_1.assignReviewers)({
             number,
@@ -97,6 +96,7 @@ async function run() {
             debug: core.debug,
             owner: github_1.context.repo.owner,
             repo: github_1.context.repo.repo,
+            userLogin,
         });
         core.info(`@${authors} has been assigned to the pull request: #${number}`);
     }

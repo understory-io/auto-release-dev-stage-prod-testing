@@ -5,12 +5,14 @@ export async function assignReviewers({
   repo,
   number,
   token,
+  userLogin,
   debug,
 }: {
   owner: string;
   repo: string;
   number: number;
   token: string;
+  userLogin: string;
   debug: (message: string) => void;
 }) {
   const octokit = getOctokit(token);
@@ -29,11 +31,10 @@ export async function assignReviewers({
   }
 
   // deduplicate authors in case of multiple commits by the same author
-  const authors = [
-    ...new Set<string>(
-      commits.data.map((commit) => commit.author?.login as string)
-    ),
-  ];
+  const authors = new Set<string>(
+    commits.data.map((commit) => commit.author?.login as string)
+  );
+  authors.delete(userLogin);
 
   debug(`Authors: ${authors}`);
 
@@ -41,7 +42,7 @@ export async function assignReviewers({
     owner: owner,
     repo: repo,
     pull_number: number,
-    reviewers: authors,
+    reviewers: [...authors],
   });
 
   debug("request reviewers " + JSON.stringify(result));

@@ -8,7 +8,10 @@ async function run() {
     if (target === undefined) {
       throw new Error("Can't get payload. Check you trigger event");
     }
-    const { number } = target;
+    const {
+      number,
+      user: { login: userLogin },
+    } = target;
 
     const token = core.getInput("token", { required: true });
 
@@ -18,6 +21,7 @@ async function run() {
       debug: core.debug,
       owner: context.repo.owner,
       repo: context.repo.repo,
+      userLogin,
     });
 
     core.info(`@${authors} has been assigned to the pull request: #${number}`);
