@@ -1,6 +1,123 @@
 /******/ (() => { // webpackBootstrap
 /******/ 	var __webpack_modules__ = ({
 
+/***/ 2103:
+/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.assignReviewers = assignReviewers;
+const github_1 = __nccwpck_require__(3228);
+async function assignReviewers({ owner, repo, number, token, userLogin, debug, }) {
+    const octokit = (0, github_1.getOctokit)(token);
+    let commits;
+    try {
+        commits = await octokit.rest.pulls.listCommits({
+            owner: owner,
+            repo: repo,
+            pull_number: number,
+        });
+        debug("Commits: " + JSON.stringify(commits));
+    }
+    catch (error) {
+        throw new Error("Failed to list commits: " + error.message); // TODO: add cause
+    }
+    // deduplicate authors in case of multiple commits by the same author
+    const authors = new Set(commits.data.map((commit) => commit.author?.login));
+    authors.delete(userLogin);
+    debug(`Authors: ${authors}`);
+    const result = await octokit.rest.pulls.requestReviewers({
+        owner: owner,
+        repo: repo,
+        pull_number: number,
+        reviewers: [...authors],
+    });
+    debug("request reviewers " + JSON.stringify(result));
+    return [...authors];
+}
+
+
+/***/ }),
+
+/***/ 1188:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || (function () {
+    var ownKeys = function(o) {
+        ownKeys = Object.getOwnPropertyNames || function (o) {
+            var ar = [];
+            for (var k in o) if (Object.prototype.hasOwnProperty.call(o, k)) ar[ar.length] = k;
+            return ar;
+        };
+        return ownKeys(o);
+    };
+    return function (mod) {
+        if (mod && mod.__esModule) return mod;
+        var result = {};
+        if (mod != null) for (var k = ownKeys(mod), i = 0; i < k.length; i++) if (k[i] !== "default") __createBinding(result, mod, k[i]);
+        __setModuleDefault(result, mod);
+        return result;
+    };
+})();
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+const core = __importStar(__nccwpck_require__(7484));
+const github_1 = __nccwpck_require__(3228);
+const assignReviewers_1 = __nccwpck_require__(2103);
+async function run() {
+    try {
+        const target = github_1.context.payload.pull_request;
+        if (target === undefined) {
+            throw new Error("Can't get payload. Check you trigger event");
+        }
+        const { number, user: { login: userLogin }, } = target;
+        const token = core.getInput("token", { required: true });
+        const authors = await (0, assignReviewers_1.assignReviewers)({
+            number,
+            token,
+            debug: core.debug,
+            owner: github_1.context.repo.owner,
+            repo: github_1.context.repo.repo,
+            userLogin,
+        });
+        if (authors.length === 0) {
+            core.info(`No reviewers have been assigned to the pull request: #${number}`);
+        }
+        else {
+            core.info(`${authors
+                .map((a) => `@${a}`)
+                .join(", ")} has been assigned to the pull request: #${number}`);
+        }
+    }
+    catch (error) {
+        core.debug("context.payload: " + JSON.stringify(github_1.context.payload));
+        core.error(error);
+        core.setFailed(error.message);
+    }
+}
+run();
+
+
+/***/ }),
+
 /***/ 4914:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
@@ -31820,102 +31937,17 @@ module.exports = parseParams
 /******/ 	}
 /******/ 	
 /************************************************************************/
-/******/ 	/* webpack/runtime/compat get default export */
-/******/ 	(() => {
-/******/ 		// getDefaultExport function for compatibility with non-harmony modules
-/******/ 		__nccwpck_require__.n = (module) => {
-/******/ 			var getter = module && module.__esModule ?
-/******/ 				() => (module['default']) :
-/******/ 				() => (module);
-/******/ 			__nccwpck_require__.d(getter, { a: getter });
-/******/ 			return getter;
-/******/ 		};
-/******/ 	})();
-/******/ 	
-/******/ 	/* webpack/runtime/define property getters */
-/******/ 	(() => {
-/******/ 		// define getter functions for harmony exports
-/******/ 		__nccwpck_require__.d = (exports, definition) => {
-/******/ 			for(var key in definition) {
-/******/ 				if(__nccwpck_require__.o(definition, key) && !__nccwpck_require__.o(exports, key)) {
-/******/ 					Object.defineProperty(exports, key, { enumerable: true, get: definition[key] });
-/******/ 				}
-/******/ 			}
-/******/ 		};
-/******/ 	})();
-/******/ 	
-/******/ 	/* webpack/runtime/hasOwnProperty shorthand */
-/******/ 	(() => {
-/******/ 		__nccwpck_require__.o = (obj, prop) => (Object.prototype.hasOwnProperty.call(obj, prop))
-/******/ 	})();
-/******/ 	
-/******/ 	/* webpack/runtime/make namespace object */
-/******/ 	(() => {
-/******/ 		// define __esModule on exports
-/******/ 		__nccwpck_require__.r = (exports) => {
-/******/ 			if(typeof Symbol !== 'undefined' && Symbol.toStringTag) {
-/******/ 				Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
-/******/ 			}
-/******/ 			Object.defineProperty(exports, '__esModule', { value: true });
-/******/ 		};
-/******/ 	})();
-/******/ 	
 /******/ 	/* webpack/runtime/compat */
 /******/ 	
 /******/ 	if (typeof __nccwpck_require__ !== 'undefined') __nccwpck_require__.ab = __dirname + "/";
 /******/ 	
 /************************************************************************/
-var __webpack_exports__ = {};
-// This entry need to be wrapped in an IIFE because it need to be in strict mode.
-(() => {
-"use strict";
-__nccwpck_require__.r(__webpack_exports__);
-/* harmony import */ var _actions_core__WEBPACK_IMPORTED_MODULE_0__ = __nccwpck_require__(7484);
-/* harmony import */ var _actions_core__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__nccwpck_require__.n(_actions_core__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _actions_github__WEBPACK_IMPORTED_MODULE_1__ = __nccwpck_require__(3228);
-/* harmony import */ var _actions_github__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__nccwpck_require__.n(_actions_github__WEBPACK_IMPORTED_MODULE_1__);
-
-
-
-async function run() {
-  try {
-    const target = _actions_github__WEBPACK_IMPORTED_MODULE_1__.context.payload.pull_request;
-    if (target === undefined) {
-      _actions_core__WEBPACK_IMPORTED_MODULE_0__.info("Payload: " + JSON.stringify(_actions_github__WEBPACK_IMPORTED_MODULE_1__.context.payload));
-      throw new Error("Can't get payload. Check you trigger event");
-    }
-    const {
-      pull_request: { requested_reviewers: reviews },
-      number,
-      user: { login: author, type },
-    } = target;
-
-    if (type === "Bot") {
-      _actions_core__WEBPACK_IMPORTED_MODULE_0__.info("Assigning author has been skipped since the author is a bot");
-      return;
-    }
-
-    const token = _actions_core__WEBPACK_IMPORTED_MODULE_0__.getInput("repo-token", { required: true });
-    const octokit = (0,_actions_github__WEBPACK_IMPORTED_MODULE_1__.getOctokit)(token);
-
-    const result = await octokit.rest.pulls.requestReviewers({
-      owner: _actions_github__WEBPACK_IMPORTED_MODULE_1__.context.repo.owner,
-      repo: _actions_github__WEBPACK_IMPORTED_MODULE_1__.context.repo.repo,
-      issue_number: number,
-      reviewers: [...reviews, author],
-    });
-
-    _actions_core__WEBPACK_IMPORTED_MODULE_0__.debug(JSON.stringify(result));
-    _actions_core__WEBPACK_IMPORTED_MODULE_0__.info(`@${author} has been assigned to the pull request: #${number}`);
-  } catch (error) {
-    _actions_core__WEBPACK_IMPORTED_MODULE_0__.setFailed(error.message);
-  }
-}
-
-run();
-
-})();
-
-module.exports = __webpack_exports__;
+/******/ 	
+/******/ 	// startup
+/******/ 	// Load entry module and return exports
+/******/ 	// This entry module is referenced by other modules so it can't be inlined
+/******/ 	var __webpack_exports__ = __nccwpck_require__(1188);
+/******/ 	module.exports = __webpack_exports__;
+/******/ 	
 /******/ })()
 ;

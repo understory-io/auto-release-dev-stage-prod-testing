@@ -1,5 +1,4 @@
-name: Automatically create / update release PRs
-run-name: Create PRs for deployment
+name: Update release PRs
 on:
   push:
     branches:
@@ -13,7 +12,7 @@ permissions:
 jobs:
   release-prs:
     runs-on: ubuntu-latest
-    name: Create PRs for deployment
+    name: Update release PRs
     steps:
       - name: Detect target branch
         id: detect-target-branch
@@ -32,6 +31,7 @@ jobs:
         id: create-pull-request
         uses: peter-evans/create-pull-request@v7
         with:
+          token: ${{ secrets.PAT }}
           branch: release/auto-${{ steps.detect-target-branch.outputs.TARGET_BRANCH }}
           commit-message: |
             Merge ${{ github.ref_name }} into ${{ steps.detect-target-branch.outputs.TARGET_BRANCH }}
