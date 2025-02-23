@@ -14,7 +14,7 @@ export async function assignReviewers({
   token: string;
   userLogin: string;
   debug: (message: string) => void;
-}) {
+}): Promise<Array<string>> {
   const octokit = getOctokit(token);
 
   let commits;
@@ -47,5 +47,5 @@ export async function assignReviewers({
 
   debug("request reviewers " + JSON.stringify(result));
 
-  return authors;
+  return [...authors];
 }

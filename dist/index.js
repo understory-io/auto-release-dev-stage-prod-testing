@@ -34,7 +34,7 @@ async function assignReviewers({ owner, repo, number, token, userLogin, debug, }
         reviewers: [...authors],
     });
     debug("request reviewers " + JSON.stringify(result));
-    return authors;
+    return [...authors];
 }
 
 
