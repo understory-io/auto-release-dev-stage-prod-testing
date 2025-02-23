@@ -2,9 +2,9 @@
   "name": "assign-author-review",
   "version": "0.0.1",
   "description": "",
-  "main": "index.js",
+  "main": "lib/index.js",
   "scripts": {
-    "build": "ncc build index.js --license licenses.txt",
+    "build": "tsc && ncc build lib/index.js --license licenses.txt",
     "test": "echo \"Error: no test specified\" && exit 1",
     "prepare": "husky"
   },
@@ -15,7 +15,9 @@
     "@actions/github": "^6.0.0"
   },
   "devDependencies": {
+    "@types/node": "^22.13.5",
     "@vercel/ncc": "^0.38.3",
-    "husky": "^9.1.7"
+    "husky": "^9.1.7",
+    "typescript": "^5.7.3"
   }
 }
