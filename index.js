@@ -1,39 +1,31 @@
 import * as core from "@actions/core";
-import { context, getOctokit } from "@actions/github";
+import { context } from "@actions/github";
+import { assignReviewers } from "./assignReviewers";
 
-async function run() {
+async function run(context) {
   try {
     const target = context.payload.pull_request;
     if (target === undefined) {
-      core.info("Payload: " + JSON.stringify(context.payload));
       throw new Error("Can't get payload. Check you trigger event");
     }
-    const {
-      pull_request: { requested_reviewers: reviews },
+    const { number } = target;
+
+    const token = core.getInput("token", { required: true });
+
+    const authors = await assignReviewers({
       number,
-      user: { login: author, type },
-    } = target;
-
-    if (type === "Bot") {
-      core.info("Assigning author has been skipped since the author is a bot");
-      return;
-    }
-
-    const token = core.getInput("repo-token", { required: true });
-    const octokit = getOctokit(token);
-
-    const result = await octokit.rest.pulls.requestReviewers({
+      token,
+      debug: core.debug,
       owner: context.repo.owner,
       repo: context.repo.repo,
-      issue_number: number,
-      reviewers: [...reviews, author],
     });
 
-    core.debug(JSON.stringify(result));
-    core.info(`@${author} has been assigned to the pull request: #${number}`);
+    core.info(`@${authors} has been assigned to the pull request: #${number}`);
   } catch (error) {
+    core.debug("context.payload: " + JSON.stringify(context.payload));
+    core.error(error);
     core.setFailed(error.message);
   }
 }
 
-run();
+run(context);
