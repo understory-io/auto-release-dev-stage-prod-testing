@@ -1,6 +1,18 @@
 import { getOctokit } from "@actions/github";
 
-export async function assignReviewers({ owner, repo, number, token, debug }) {
+export async function assignReviewers({
+  owner,
+  repo,
+  number,
+  token,
+  debug,
+}: {
+  owner: string;
+  repo: string;
+  number: number;
+  token: string;
+  debug: (message: string) => void;
+}) {
   const octokit = getOctokit(token);
 
   let commits;
@@ -12,15 +24,15 @@ export async function assignReviewers({ owner, repo, number, token, debug }) {
       pull_number: number,
     });
     debug("Commits: " + JSON.stringify(commits));
-  } catch (error) {
-    throw new Error("Failed to list commits", {
-      cause: error,
-    });
+  } catch (error: any) {
+    throw new Error("Failed to list commits: " + error.message); // TODO: add cause
   }
 
   // deduplicate authors in case of multiple commits by the same author
   const authors = [
-    ...new Set(commits.data.map((commit) => commit.author.login)),
+    ...new Set<string>(
+      commits.data.map((commit) => commit.author?.login as string)
+    ),
   ];
 
   debug(`Authors: ${authors}`);

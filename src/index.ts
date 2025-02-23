@@ -2,7 +2,7 @@ import * as core from "@actions/core";
 import { context } from "@actions/github";
 import { assignReviewers } from "./assignReviewers";
 
-async function run(context) {
+async function run() {
   try {
     const target = context.payload.pull_request;
     if (target === undefined) {
@@ -21,11 +21,11 @@ async function run(context) {
     });
 
     core.info(`@${authors} has been assigned to the pull request: #${number}`);
-  } catch (error) {
+  } catch (error: any) {
     core.debug("context.payload: " + JSON.stringify(context.payload));
     core.error(error);
     core.setFailed(error.message);
   }
 }
 
-run(context);
+run();
