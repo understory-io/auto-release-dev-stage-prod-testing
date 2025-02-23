@@ -10,11 +10,6 @@ async function run() {
     }
     const { number } = target;
 
-    if (type === "Bot") {
-      core.info("Assigning author has been skipped since the author is a bot");
-      return;
-    }
-
     const token = core.getInput("repo-token", { required: true });
     const octokit = getOctokit(token);
 

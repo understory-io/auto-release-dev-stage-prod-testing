@@ -31886,11 +31886,6 @@ async function run() {
     }
     const { number } = target;
 
-    if (type === "Bot") {
-      _actions_core__WEBPACK_IMPORTED_MODULE_0__.info("Assigning author has been skipped since the author is a bot");
-      return;
-    }
-
     const token = _actions_core__WEBPACK_IMPORTED_MODULE_0__.getInput("repo-token", { required: true });
     const octokit = (0,_actions_github__WEBPACK_IMPORTED_MODULE_1__.getOctokit)(token);
 
