@@ -1,0 +1,16 @@
+name: Automatically assign reviewers to release PRs
+run-name: Automatically assign reviewers to release PRs
+on:
+  pull_request_target:
+    types: [opened, synchronize, reopened]
+    branches:
+      - "stage"
+      - "prod"
+
+jobs:
+  assign-reviewers:
+    runs-on: ubuntu-latest
+    name: Assign reviewers
+    steps:
+      - name: Assign reviewers
+        uses: understory-io/auto-release-dev-stage-prod-testing@dev

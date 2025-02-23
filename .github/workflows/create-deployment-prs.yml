@@ -11,8 +11,9 @@ permissions:
   pull-requests: write
 
 jobs:
-  create_pr_repo_sync:
+  release-prs:
     runs-on: ubuntu-latest
+    name: Create PRs for deployment
     steps:
       - name: Detect target branch
         id: detect-target-branch
@@ -28,6 +29,7 @@ jobs:
           git reset --hard ${{ github.ref_name }}
 
       - name: Create Pull Request
+        id: create-pull-request
         uses: peter-evans/create-pull-request@v7
         with:
           branch: release/auto-${{ steps.detect-target-branch.outputs.TARGET_BRANCH }}
@@ -36,5 +38,7 @@ jobs:
           title:
             "Release ${{ github.ref_name }} to ${{ steps.detect-target-branch.outputs.TARGET_BRANCH }}"
             # consider having tags in here to ping commit authors
-          body: "Automated PR for releasing changes from ${{ github.ref_name }} into ${{ steps.detect-target-branch.outputs.TARGET_BRANCH }}"
+          body: |
+            Automated PR for releasing changes from ${{ github.ref_name }} into ${{ steps.detect-target-branch.outputs.TARGET_BRANCH }}
           maintainer-can-modify: false
+          delete-branch: true
