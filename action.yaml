@@ -1,9 +1,9 @@
 name: "Assign author review"
 description: "Automatically assign git commit authors as review on release PRs"
-inputs:
-  pr-number:
-    description: "The release PR number"
-    required: true
+# inputs:
+#   pr-number:
+#     description: "The release PR number"
+#     required: true
 # outputs:
 #   time: # id of output
 #     description: "The time we greeted you"
