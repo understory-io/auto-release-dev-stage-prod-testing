@@ -1,5 +1,6 @@
 import * as core from "@actions/core";
-import { context, getOctokit } from "@actions/github";
+import { context } from "@actions/github";
+import { assignReviewers } from "./assignReviewers";
 
 async function run(context) {
   try {
@@ -10,36 +11,14 @@ async function run(context) {
     const { number } = target;
 
     const token = core.getInput("token", { required: true });
-    const octokit = getOctokit(token);
 
-    let commits;
-    try {
-      commits = await octokit.rest.pulls.listCommits({
-        owner: context.repo.owner,
-        repo: context.repo.repo,
-        pull_number: number,
-      });
-      core.debug("Commits: " + JSON.stringify(commits));
-    } catch (error) {
-      core.error("failed to list commits");
-      throw error;
-    }
-
-    // deduplicate authors in case of multiple commits by the same author
-    const authors = [
-      ...new Set(commits.data.map((commit) => commit.author.login)),
-    ];
-
-    core.info(`Authors: ${authors}`);
-
-    const result = await octokit.rest.pulls.requestReviewers({
+    const authors = await assignReviewers({
+      number,
+      token,
+      debug: core.debug,
       owner: context.repo.owner,
       repo: context.repo.repo,
-      pull_number: number,
-      reviewers: authors,
     });
-
-    core.debug("request reviewers " + JSON.stringify(result));
 
     core.info(`@${authors} has been assigned to the pull request: #${number}`);
   } catch (error) {

@@ -31820,46 +31820,6 @@ module.exports = parseParams
 /******/ 	}
 /******/ 	
 /************************************************************************/
-/******/ 	/* webpack/runtime/compat get default export */
-/******/ 	(() => {
-/******/ 		// getDefaultExport function for compatibility with non-harmony modules
-/******/ 		__nccwpck_require__.n = (module) => {
-/******/ 			var getter = module && module.__esModule ?
-/******/ 				() => (module['default']) :
-/******/ 				() => (module);
-/******/ 			__nccwpck_require__.d(getter, { a: getter });
-/******/ 			return getter;
-/******/ 		};
-/******/ 	})();
-/******/ 	
-/******/ 	/* webpack/runtime/define property getters */
-/******/ 	(() => {
-/******/ 		// define getter functions for harmony exports
-/******/ 		__nccwpck_require__.d = (exports, definition) => {
-/******/ 			for(var key in definition) {
-/******/ 				if(__nccwpck_require__.o(definition, key) && !__nccwpck_require__.o(exports, key)) {
-/******/ 					Object.defineProperty(exports, key, { enumerable: true, get: definition[key] });
-/******/ 				}
-/******/ 			}
-/******/ 		};
-/******/ 	})();
-/******/ 	
-/******/ 	/* webpack/runtime/hasOwnProperty shorthand */
-/******/ 	(() => {
-/******/ 		__nccwpck_require__.o = (obj, prop) => (Object.prototype.hasOwnProperty.call(obj, prop))
-/******/ 	})();
-/******/ 	
-/******/ 	/* webpack/runtime/make namespace object */
-/******/ 	(() => {
-/******/ 		// define __esModule on exports
-/******/ 		__nccwpck_require__.r = (exports) => {
-/******/ 			if(typeof Symbol !== 'undefined' && Symbol.toStringTag) {
-/******/ 				Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
-/******/ 			}
-/******/ 			Object.defineProperty(exports, '__esModule', { value: true });
-/******/ 		};
-/******/ 	})();
-/******/ 	
 /******/ 	/* webpack/runtime/compat */
 /******/ 	
 /******/ 	if (typeof __nccwpck_require__ !== 'undefined') __nccwpck_require__.ab = __dirname + "/";
@@ -31869,11 +31829,53 @@ var __webpack_exports__ = {};
 // This entry need to be wrapped in an IIFE because it need to be in strict mode.
 (() => {
 "use strict";
-__nccwpck_require__.r(__webpack_exports__);
-/* harmony import */ var _actions_core__WEBPACK_IMPORTED_MODULE_0__ = __nccwpck_require__(7484);
-/* harmony import */ var _actions_core__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__nccwpck_require__.n(_actions_core__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _actions_github__WEBPACK_IMPORTED_MODULE_1__ = __nccwpck_require__(3228);
-/* harmony import */ var _actions_github__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__nccwpck_require__.n(_actions_github__WEBPACK_IMPORTED_MODULE_1__);
+
+// EXTERNAL MODULE: ./node_modules/@actions/core/lib/core.js
+var core = __nccwpck_require__(7484);
+// EXTERNAL MODULE: ./node_modules/@actions/github/lib/github.js
+var github = __nccwpck_require__(3228);
+;// CONCATENATED MODULE: ./assignReviewers.js
+
+
+async function assignReviewers({ owner, repo, number, token, debug }) {
+  const octokit = (0,github.getOctokit)(token);
+
+  let commits;
+
+  try {
+    commits = await octokit.rest.pulls.listCommits({
+      owner: owner,
+      repo: repo,
+      pull_number: number,
+    });
+    debug("Commits: " + JSON.stringify(commits));
+  } catch (error) {
+    throw new Error("Failed to list commits", {
+      cause: error,
+    });
+  }
+
+  // deduplicate authors in case of multiple commits by the same author
+  const authors = [
+    ...new Set(commits.data.map((commit) => commit.author.login)),
+  ];
+
+  debug(`Authors: ${authors}`);
+
+  const result = await octokit.rest.pulls.requestReviewers({
+    owner: owner,
+    repo: repo,
+    pull_number: number,
+    reviewers: authors,
+  });
+
+  debug("request reviewers " + JSON.stringify(result));
+
+  return authors;
+}
+
+;// CONCATENATED MODULE: ./index.js
+
 
 
 
@@ -31885,47 +31887,25 @@ async function run(context) {
     }
     const { number } = target;
 
-    const token = _actions_core__WEBPACK_IMPORTED_MODULE_0__.getInput("token", { required: true });
-    const octokit = (0,_actions_github__WEBPACK_IMPORTED_MODULE_1__.getOctokit)(token);
+    const token = core.getInput("token", { required: true });
 
-    let commits;
-    try {
-      commits = await octokit.rest.pulls.listCommits({
-        owner: context.repo.owner,
-        repo: context.repo.repo,
-        pull_number: number,
-      });
-      _actions_core__WEBPACK_IMPORTED_MODULE_0__.debug("Commits: " + JSON.stringify(commits));
-    } catch (error) {
-      _actions_core__WEBPACK_IMPORTED_MODULE_0__.error("failed to list commits");
-      throw error;
-    }
-
-    // deduplicate authors in case of multiple commits by the same author
-    const authors = [
-      ...new Set(commits.data.map((commit) => commit.author.login)),
-    ];
-
-    _actions_core__WEBPACK_IMPORTED_MODULE_0__.info(`Authors: ${authors}`);
-
-    const result = await octokit.rest.pulls.requestReviewers({
+    const authors = await assignReviewers({
+      number,
+      token,
+      debug: core.debug,
       owner: context.repo.owner,
       repo: context.repo.repo,
-      pull_number: number,
-      reviewers: authors,
     });
 
-    _actions_core__WEBPACK_IMPORTED_MODULE_0__.debug("request reviewers " + JSON.stringify(result));
-
-    _actions_core__WEBPACK_IMPORTED_MODULE_0__.info(`@${authors} has been assigned to the pull request: #${number}`);
+    core.info(`@${authors} has been assigned to the pull request: #${number}`);
   } catch (error) {
-    _actions_core__WEBPACK_IMPORTED_MODULE_0__.debug("context.payload: " + JSON.stringify(context.payload));
-    _actions_core__WEBPACK_IMPORTED_MODULE_0__.error(error);
-    _actions_core__WEBPACK_IMPORTED_MODULE_0__.setFailed(error.message);
+    core.debug("context.payload: " + JSON.stringify(context.payload));
+    core.error(error);
+    core.setFailed(error.message);
   }
 }
 
-run(_actions_github__WEBPACK_IMPORTED_MODULE_1__.context);
+run(github.context);
 
 })();
 
