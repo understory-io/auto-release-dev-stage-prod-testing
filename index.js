@@ -3,7 +3,6 @@ import { context, getOctokit } from "@actions/github";
 
 async function run() {
   try {
-    core.info("Payload: " + JSON.stringify(context.payload));
     const target = context.payload.pull_request;
     if (target === undefined) {
       throw new Error("Can't get payload. Check you trigger event");
@@ -31,6 +30,7 @@ async function run() {
     core.debug(JSON.stringify(result));
     core.info(`@${author} has been assigned to the pull request: #${number}`);
   } catch (error) {
+    core.info("Payload: " + JSON.stringify(context.payload));
     core.setFailed(error.message);
   }
 }

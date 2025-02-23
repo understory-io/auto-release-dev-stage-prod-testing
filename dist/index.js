@@ -31879,7 +31879,6 @@ __nccwpck_require__.r(__webpack_exports__);
 
 async function run() {
   try {
-    _actions_core__WEBPACK_IMPORTED_MODULE_0__.info("Payload: " + JSON.stringify(_actions_github__WEBPACK_IMPORTED_MODULE_1__.context.payload));
     const target = _actions_github__WEBPACK_IMPORTED_MODULE_1__.context.payload.pull_request;
     if (target === undefined) {
       throw new Error("Can't get payload. Check you trigger event");
@@ -31907,6 +31906,7 @@ async function run() {
     _actions_core__WEBPACK_IMPORTED_MODULE_0__.debug(JSON.stringify(result));
     _actions_core__WEBPACK_IMPORTED_MODULE_0__.info(`@${author} has been assigned to the pull request: #${number}`);
   } catch (error) {
+    _actions_core__WEBPACK_IMPORTED_MODULE_0__.info("Payload: " + JSON.stringify(_actions_github__WEBPACK_IMPORTED_MODULE_1__.context.payload));
     _actions_core__WEBPACK_IMPORTED_MODULE_0__.setFailed(error.message);
   }
 }
