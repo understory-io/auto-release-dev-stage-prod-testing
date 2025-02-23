@@ -5,6 +5,7 @@ async function run() {
   try {
     const target = context.payload.pull_request;
     if (target === undefined) {
+      core.info("Payload: " + JSON.stringify(context.payload));
       throw new Error("Can't get payload. Check you trigger event");
     }
     const {

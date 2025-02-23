@@ -31881,6 +31881,7 @@ async function run() {
   try {
     const target = _actions_github__WEBPACK_IMPORTED_MODULE_1__.context.payload.pull_request;
     if (target === undefined) {
+      _actions_core__WEBPACK_IMPORTED_MODULE_0__.info("Payload: " + JSON.stringify(_actions_github__WEBPACK_IMPORTED_MODULE_1__.context.payload));
       throw new Error("Can't get payload. Check you trigger event");
     }
     const {
