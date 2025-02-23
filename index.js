@@ -1,7 +1,7 @@
 import * as core from "@actions/core";
 import { context, getOctokit } from "@actions/github";
 
-async function run() {
+async function run(context) {
   try {
     const target = context.payload.pull_request;
     if (target === undefined) {
@@ -24,14 +24,17 @@ async function run() {
       throw error;
     }
 
-    const authors = commits.data.map((commit) => commit.author.login);
+    // deduplicate authors in case of multiple commits by the same author
+    const authors = [
+      ...new Set(commits.data.map((commit) => commit.author.login)),
+    ];
 
     core.info(`Authors: ${authors}`);
 
     const result = await octokit.rest.pulls.requestReviewers({
       owner: context.repo.owner,
       repo: context.repo.repo,
-      issue_number: number,
+      pull_number: number,
       reviewers: [authors],
     });
 
@@ -44,4 +47,4 @@ async function run() {
   }
 }
 
-run();
+run(context);

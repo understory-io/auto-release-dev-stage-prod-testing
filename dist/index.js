@@ -31877,9 +31877,9 @@ __nccwpck_require__.r(__webpack_exports__);
 
 
 
-async function run() {
+async function run(context) {
   try {
-    const target = _actions_github__WEBPACK_IMPORTED_MODULE_1__.context.payload.pull_request;
+    const target = context.payload.pull_request;
     if (target === undefined) {
       throw new Error("Can't get payload. Check you trigger event");
     }
@@ -31891,8 +31891,8 @@ async function run() {
     let commits;
     try {
       commits = await octokit.rest.pulls.listCommits({
-        owner: _actions_github__WEBPACK_IMPORTED_MODULE_1__.context.repo.owner,
-        repo: _actions_github__WEBPACK_IMPORTED_MODULE_1__.context.repo.repo,
+        owner: context.repo.owner,
+        repo: context.repo.repo,
         pull_number: number,
       });
     } catch (error) {
@@ -31900,27 +31900,30 @@ async function run() {
       throw error;
     }
 
-    const authors = commits.data.map((commit) => commit.author.login);
+    // deduplicate authors in case of multiple commits by the same author
+    const authors = [
+      ...new Set(commits.data.map((commit) => commit.author.login)),
+    ];
 
     _actions_core__WEBPACK_IMPORTED_MODULE_0__.info(`Authors: ${authors}`);
 
     const result = await octokit.rest.pulls.requestReviewers({
-      owner: _actions_github__WEBPACK_IMPORTED_MODULE_1__.context.repo.owner,
-      repo: _actions_github__WEBPACK_IMPORTED_MODULE_1__.context.repo.repo,
-      issue_number: number,
+      owner: context.repo.owner,
+      repo: context.repo.repo,
+      pull_number: number,
       reviewers: [authors],
     });
 
     _actions_core__WEBPACK_IMPORTED_MODULE_0__.debug(JSON.stringify(result));
     _actions_core__WEBPACK_IMPORTED_MODULE_0__.info(`@${author} has been assigned to the pull request: #${number}`);
   } catch (error) {
-    _actions_core__WEBPACK_IMPORTED_MODULE_0__.debug("context.payload: " + JSON.stringify(_actions_github__WEBPACK_IMPORTED_MODULE_1__.context.payload));
+    _actions_core__WEBPACK_IMPORTED_MODULE_0__.debug("context.payload: " + JSON.stringify(context.payload));
     _actions_core__WEBPACK_IMPORTED_MODULE_0__.error(error);
     _actions_core__WEBPACK_IMPORTED_MODULE_0__.setFailed(error.message);
   }
 }
 
-run();
+run(_actions_github__WEBPACK_IMPORTED_MODULE_1__.context);
 
 })();
 
