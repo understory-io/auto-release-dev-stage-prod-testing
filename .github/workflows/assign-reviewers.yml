@@ -2,7 +2,6 @@ name: Automatically assign reviewers to release PRs
 run-name: Automatically assign reviewers to release PRs
 on:
   pull_request_target:
-    types: [opened, reopened]
 
 permissions:
   pull-requests: write
