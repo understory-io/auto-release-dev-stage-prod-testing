@@ -35,9 +35,7 @@ jobs:
           branch: release/auto-${{ steps.detect-target-branch.outputs.TARGET_BRANCH }}
           commit-message: |
             Merge ${{ github.ref_name }} into ${{ steps.detect-target-branch.outputs.TARGET_BRANCH }}
-          title:
-            "Release ${{ github.ref_name }} to ${{ steps.detect-target-branch.outputs.TARGET_BRANCH }}"
-            # consider having tags in here to ping commit authors
+          title: "Release ${{ github.ref_name }} to ${{ steps.detect-target-branch.outputs.TARGET_BRANCH }}"
           body: |
             Automated PR for releasing changes from ${{ github.ref_name }} into ${{ steps.detect-target-branch.outputs.TARGET_BRANCH }}
           maintainer-can-modify: false
