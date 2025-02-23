@@ -24,7 +24,17 @@ async function run() {
       userLogin,
     });
 
-    core.info(`@${authors} has been assigned to the pull request: #${number}`);
+    if (authors.length === 0) {
+      core.info(
+        `No reviewers have been assigned to the pull request: #${number}`
+      );
+    } else {
+      core.info(
+        `${authors
+          .map((a) => `@${a}`)
+          .join(", ")} has been assigned to the pull request: #${number}`
+      );
+    }
   } catch (error: any) {
     core.debug("context.payload: " + JSON.stringify(context.payload));
     core.error(error);
