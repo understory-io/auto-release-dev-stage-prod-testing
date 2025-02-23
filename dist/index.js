@@ -31906,7 +31906,8 @@ async function run() {
     _actions_core__WEBPACK_IMPORTED_MODULE_0__.debug(JSON.stringify(result));
     _actions_core__WEBPACK_IMPORTED_MODULE_0__.info(`@${author} has been assigned to the pull request: #${number}`);
   } catch (error) {
-    _actions_core__WEBPACK_IMPORTED_MODULE_0__.info("Payload: " + JSON.stringify(_actions_github__WEBPACK_IMPORTED_MODULE_1__.context.payload));
+    _actions_core__WEBPACK_IMPORTED_MODULE_0__.debug("context.payload: " + JSON.stringify(_actions_github__WEBPACK_IMPORTED_MODULE_1__.context.payload));
+    _actions_core__WEBPACK_IMPORTED_MODULE_0__.error(error);
     _actions_core__WEBPACK_IMPORTED_MODULE_0__.setFailed(error.message);
   }
 }

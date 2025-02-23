@@ -30,7 +30,8 @@ async function run() {
     core.debug(JSON.stringify(result));
     core.info(`@${author} has been assigned to the pull request: #${number}`);
   } catch (error) {
-    core.info("Payload: " + JSON.stringify(context.payload));
+    core.debug("context.payload: " + JSON.stringify(context.payload));
+    core.error(error);
     core.setFailed(error.message);
   }
 }
