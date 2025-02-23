@@ -35,7 +35,7 @@ async function run(context) {
       owner: context.repo.owner,
       repo: context.repo.repo,
       pull_number: number,
-      reviewers: [authors],
+      reviewers: authors,
     });
 
     core.debug(JSON.stringify(result));

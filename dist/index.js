@@ -31911,7 +31911,7 @@ async function run(context) {
       owner: context.repo.owner,
       repo: context.repo.repo,
       pull_number: number,
-      reviewers: [authors],
+      reviewers: authors,
     });
 
     _actions_core__WEBPACK_IMPORTED_MODULE_0__.debug(JSON.stringify(result));
