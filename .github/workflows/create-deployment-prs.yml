@@ -14,3 +14,5 @@ jobs:
     uses: understory-io/workflows/.github/workflows/create-deployment-prs.yml@feature/release-prs
     secrets:
       token: ${{ secrets.PAT }}
+    with:
+      promotionPairs: "dev=staging,staging=production"
